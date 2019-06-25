@@ -2,7 +2,7 @@ import React from 'react';
 
 const Aside = () => {
     return (
-        <aside>
+        <aside style={{position: "sticky", top: "15px"}}>
             <div className="box">
                 <h3 className="title is-5">Wanna buy a product? Send us a message here!</h3>
                 <form action="get">

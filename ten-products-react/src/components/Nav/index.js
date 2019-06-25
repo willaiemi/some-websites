@@ -2,7 +2,7 @@ import React from 'react';
 
 const Nav = () => {
     return (
-        <nav>
+        <nav style={{position: "sticky", top: "15px"}} >
             <div className="box">
                 <div className="content">
                     <h4 className="title is-3">Shipping</h4>

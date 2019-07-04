@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Página de vendas online</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+</head>
+
+<body>
+    <div id="app">
+        <div class="modal" v-bind:class="{ 'is-active': isProductModalActive }">
+            <div class="modal-background"></div>
+            <div class="modal-content">
+                <!-- Any other Bulma elements you want -->
+            </div>
+            <button class="modal-close is-large" aria-label="close"></button>
+        </div>
+        <header class="hero is-primary is-bold">
+            <div class="hero-body">
+                <div class="container">
+                    <h1 class="title" v-on:click="callModal">{{title}}</h1>
+                    <h2 class="subtitle">{{subtitle}}</h2>
+                </div>
+            </div>
+        </header>
+        <div class="section columns">
+            <div class="box column is-4">
+                <section v-for="product in products" v-bind:key="product.id" @click="callModal(product.id)"
+                    style="margin: 10px 0" class="card">
+                    <header class="card-header">
+                        <h3 class="card-header-title">{{product.title}}</h3>
+                    </header>
+                    <article class="card-image">
+                        <figure class="image">
+                            <img :src="product.image" alt="product.title" />
+                        </figure>
+                    </article>
+                    <footer class="card-content">
+                        <p class="content">{{product.description}}</p>
+                        <p class="subtitle is-5 is-pulled-right">R${{product.price.toFixed(2)}}</p>
+                    </footer>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vuex"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

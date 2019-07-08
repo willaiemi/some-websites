@@ -7,47 +7,156 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Página de vendas online</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+    <script src="https://kit.fontawesome.com/eccaef6016.js"></script>
+    <style>
+        #notification {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
     <div id="app">
-        <div class="modal" v-bind:class="{ 'is-active': isProductModalActive }">
-            <div class="modal-background"></div>
-            <div class="modal-content">
-                <!-- Any other Bulma elements you want -->
+        <!-- NOTIFICATION -->
+        <div class="box level" id="notification">
+            <div class="level-left">
+                <figure class="level-item">
+                    <p class="image" style="max-width: 64px;">
+                        <img :src="currentProduct.image" :alt="currentProduct.title">
+                    </p>
+                </figure>
             </div>
-            <button class="modal-close is-large" aria-label="close"></button>
+            <div class="level-right" style="margin-left: 10px">
+                <div class="level-item content">
+                    <p>
+                        <strong>{{currentProduct.title}}</strong> was added to cart!
+                    </p>
+                </div>
+            </div>
         </div>
+
+        <!-- HEADER -->
         <header class="hero is-primary is-bold">
             <div class="hero-body">
                 <div class="container">
-                    <h1 class="title" v-on:click="callModal">{{title}}</h1>
+                    <h1 class="title">{{title}}</h1>
                     <h2 class="subtitle">{{subtitle}}</h2>
                 </div>
             </div>
         </header>
+
+        <!-- PRODUCT LIST -->
         <div class="section columns">
-            <div class="box column is-4">
-                <section v-for="product in products" v-bind:key="product.id" @click="callModal(product.id)"
-                    style="margin: 10px 0" class="card">
-                    <header class="card-header">
-                        <h3 class="card-header-title">{{product.title}}</h3>
-                    </header>
-                    <article class="card-image">
+            <div class="column is-6 is-offset-3">
+                <section class="box card" v-for="product in products" v-bind:key="product.id">
+                    <header class="card-image">
                         <figure class="image">
                             <img :src="product.image" alt="product.title" />
                         </figure>
-                    </article>
-                    <footer class="card-content">
-                        <p class="content">{{product.description}}</p>
-                        <p class="subtitle is-5 is-pulled-right">R${{product.price.toFixed(2)}}</p>
+                    </header>
+
+                    <div class="card-content">
+                        <div class="level">
+                            <div class="level-left">
+                                <div class="level-item">
+                                    <h3 class="title is-5">{{product.title}}</h3>
+                                </div>
+                            </div>
+                            <div class="level-right">
+                                <div class="level-item">
+                                    <h4 class="title is-5">R${{formatPrice(product.price)}}</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <p>
+                            {{product.description}}
+                        </p>
+                    </div>
+
+                    <footer class="card-footer">
+                        <div class="card-footer-item">
+                            <a class="button" @click="addToCart(product.id)">
+                                <span class="icon">
+                                    <i class="fas fa-cart-plus"></i>
+                                </span>
+                                <span>Add to cart</span>
+                            </a>
+                        </div>
+                        <!-- <div class="card-footer-item">
+                            <button class="button is-danger" @click="closeModal">Cancel</button>
+                        </div> -->
                     </footer>
                 </section>
             </div>
         </div>
+
+        <div class="container box" v-if="cart.length > 0">
+            <h2 class="title is-3">Cart</h2>
+            <div class="media" v-for="product in cart">
+                <figure class="media-left">
+                    <p class="image" style="max-width: 64px;">
+                        <img :src="product.image" :alt="product.title">
+                    </p>
+                </figure>
+                <div class="media-content">
+                    <div class="content">
+                        <h4 class="title is-4">{{product.title}}</h4>
+                    </div>
+
+                </div>
+                <div class="media-right">
+                    <h4 class="subtitle is-4">R${{formatPrice(product.price)}}</h4>
+                    <!-- <div class="level-item">
+                        <button class="button is-danger">Remove</button>
+                    </div> -->
+                </div>
+            </div>
+
+            <div class="columns">
+                <div class="column is-offset-9 is-mobile">
+                    <h4 class="title is-4">Total: R${{formatPrice(totalSumInCart)}}</h4>
+                </div>
+            </div>
+
+            <form class="container" id="form" onsubmit="return false">
+                <legend class="title is-3">Client Information</legend>
+                <label class="label">Name</label>
+                <div class="field is-grouped">
+                    <div class="control is-expanded">
+                        <input class="input" id="name" type="text" placeholder="Name">
+                    </div>
+                    <div class="control is-expanded">
+                        <input class="input" id="surname" type="text" placeholder="Surname">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">CPF</label>
+                    <div class="control is-expanded">
+                        <input class="input" id="cpf" type="text" placeholder="CPF">
+                    </div>
+                </div>
+
+                <div class="field is-grouped is-grouped-right">
+                    <div class="control">
+                        <input type="submit" class="button is-success" @click="buy" value="Buy" />
+                    </div>
+                    <div class="control">
+                        <button class="button is-danger" @click="clearCart">Clear cart</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <footer class="section"></footer>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/vuex"></script>
+    <script src="https://unpkg.com/vue-router"></script>
     <script src="js/main.js"></script>
 </body>
 

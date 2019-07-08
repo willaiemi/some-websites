@@ -33,7 +33,7 @@ const store = new Vuex.Store({
                 "id": 5,
                 "title": "Black Wireless Headphones",
                 "image": "https://images.unsplash.com/photo-1505751171710-1f6d0ace5a85?w=1000",
-                "price": 15.90,
+                "price": 150.90,
                 "description": "Level black wireless headphone. Great for listening to music without cables."
             },
             {
@@ -79,39 +79,80 @@ const store = new Vuex.Store({
     mutations: {
         createProduct(state, product) {
             state.products.push(product);
-            console.log(product);
+        },
+        createClient(state, client) {
+            state.clients.push(client);
         }
     }
 });
 
+const data = {
+    title: 'Products',
+    subtitle: 'Here, I sell products...',
+    isProductModalActive: false,
+    currentProduct: {},
+    timeout: null,
+    cart: []
+}
+
+var router = new VueRouter({
+    mode: 'history',
+    routes: []
+});
+
 const app = new Vue({
     el: '#app',
+    router,
     store,
-    data: {
-        title: 'Products',
-        subtitle: 'Here, I sell products...',
-        // currentProduct: null,
-        isProductModalActive: false
-    },
+    data,
     computed: {
         products() {
             return store.state.products;
+        },
+        totalSumInCart() {
+            let sum = 0;
+            app.cart.map((product) => {
+                sum += product.price;
+            });
+            return sum;
         }
     },
     methods: {
-        callModal: () => {
-            // this.currentProduct = this.products.find(p => p.id == id);
-            isProductModalActive = true;
-            console.log("aa");
+        formatPrice: (value) => {
+            let val = (value / 1).toFixed(2).replace('.', ',')
+            return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
         },
-        doIncrementation: () => {
-            store.commit('createProduct', {
-                "id": (store.state.products.length + 1),
-                "title": "A chair",
-                "image": "https://images.unsplash.com/photo-1503602642458-232111445657?w=1000",
-                "price": 10.00,
-                "description": "To sit on."
+        addToCart: (id) => {
+            clearTimeout(data.timeout);
+            app.currentProduct = app.products.find(product => id === product.id);
+            app.cart.push(app.currentProduct);
+            const notificationStyle = document.getElementById('notification').style;
+            notificationStyle.transition = "all 0.5s linear 0s";
+            notificationStyle.display = "flex";
+            notificationStyle.opacity = 1;
+
+            data.timeout = setTimeout(() => {
+                notificationStyle.transition = "all 2s ease-out 0s";
+                notificationStyle.opacity = 0;
+            }, 1000);
+
+            data.timeout = setTimeout(() => {
+                notificationStyle.display = "none";
+            }, 3000);
+        },
+        clearCart: () => {
+            app.cart = [];
+        },
+        buy: () => {
+            const name = document.getElementById('name').value + " " + document.getElementById('surname').value;
+            const cpf = document.getElementById('cpf').value;
+            let message = name + "\n" + cpf + "\n\nProducts: \n";
+            app.cart.map(product => {
+                message += product.title + "\n"
             });
+            message += "\nTotal: R$" + app.formatPrice(app.totalSumInCart);
+            alert(message);
+            app.clearCart();
         }
     }
 });
